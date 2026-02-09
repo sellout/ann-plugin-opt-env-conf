@@ -16,5 +16,11 @@ program-options
 
 tests: True
 
+source-repository-package
+    type: git
+    location: https://github.com/sellout/opt-env-conf.git
+    branch: generalize-opts
+    subdir: opt-env-conf
+
 packages:
   ./core/ann-plugin-opt-env-conf.cabal
