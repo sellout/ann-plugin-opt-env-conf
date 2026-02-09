@@ -1,0 +1,11 @@
+{
+  project:
+    {
+      creation-date: "2026-01-08",
+      description: "Unified handling of command-line options, environment variables, config files, and source annotations for GHC plugins.",
+      name: "ann-plugin-opt-env-conf",
+      repo: "sellout/ann-plugin-opt-env-conf",
+      summary: "OptEnvConf for GHC plugins",
+    },
+  type: { name: "haskell" },
+}
