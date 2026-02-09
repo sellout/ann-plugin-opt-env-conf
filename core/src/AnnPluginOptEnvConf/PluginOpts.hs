@@ -1,3 +1,4 @@
+{-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE TypeFamilies #-}
 
 -- | Backend for parsing GHC plugin command-line options.
@@ -17,12 +18,31 @@ module AnnPluginOptEnvConf.PluginOpts
   )
 where
 
-import Data.List.NonEmpty (NonEmpty (..))
-import qualified Data.List.NonEmpty as NE
-import Data.Maybe (mapMaybe)
-import OptEnvConf.Args (Dashed (..))
-import OptEnvConf.ArgsBackend
-import OptEnvConf.Reader (Reader, runReader)
+import "base" Control.Applicative (pure)
+import "base" Data.Bool (Bool (False, True), not, (&&), (||))
+import "base" Data.Either (Either (Left, Right))
+import "base" Data.Eq (Eq, (==))
+import "base" Data.Function (($))
+import "base" Data.Functor (fmap, (<$>))
+import "base" Data.Int (Int)
+import "base" Data.List (break, elem, null, reverse, unlines, zip, zipWith)
+import "base" Data.List.NonEmpty (NonEmpty ((:|)))
+import qualified "base" Data.List.NonEmpty as NE
+import "base" Data.Maybe (Maybe (Just, Nothing), mapMaybe)
+import "base" Data.Semigroup ((<>))
+import "base" Data.String (String)
+import "base" Text.Show (Show)
+import "opt-env-conf" OptEnvConf.Args (Dashed (DashedLong, DashedShort))
+import "opt-env-conf" OptEnvConf.ArgsBackend
+  ( ArgsBackend (ArgsState),
+    ArgsResult (ArgsError, ArgsFound, ArgsNotAttempted, ArgsNotFound),
+    initArgsState,
+    parseArg,
+    parseOpt,
+    parseSwitch,
+    recogniseLeftovers,
+  )
+import "opt-env-conf" OptEnvConf.Reader (Reader, runReader)
 
 -- | The plugin options argument parsing backend.
 --
@@ -48,7 +68,7 @@ instance ArgsBackend PluginOptsBackend where
 
   initArgsState _ opts =
     PluginOptsState
-      { posOptions = map (,False) opts
+      { posOptions = (,False) <$> opts
       }
 
   parseArg _ readers state = pure $ case NE.nonEmpty readers of
@@ -57,14 +77,14 @@ instance ArgsBackend PluginOptsBackend where
       -- Find unconsumed options that are NOT key=value pairs
       let unconsumed =
             [ (s, i)
-              | ((s, False), i) <- zip (posOptions state) [0 ..],
-                not (isKeyValue s)
+            | ((s, False), i) <- zip (posOptions state) [0 ..],
+              not (isKeyValue s)
             ]
        in if null unconsumed
             then [(ArgsNotFound, state)]
             else
               -- Return all possibilities plus a "not found" option for backtracking
-              map (tryConsumeArgAt rs state) unconsumed ++ [(ArgsNotFound, state)]
+              fmap (tryConsumeArgAt rs state) unconsumed <> [(ArgsNotFound, state)]
 
   parseOpt _ dasheds readers state = pure $ case (dasheds, NE.nonEmpty readers) of
     ([], _) -> (ArgsNotAttempted, state)
@@ -119,10 +139,10 @@ findAndParseOption keys opts = go opts []
     go [] _ = Nothing
     go ((s, consumed) : rest) acc
       | consumed = go rest ((s, consumed) : acc)
-      | otherwise = case parseKeyValue s of
+      | True = case parseKeyValue s of
           Just (key, val)
             | key `elem` keys ->
-                Just (val, reverse acc ++ [(s, True)] ++ rest)
+                Just (val, reverse acc <> [(s, True)] <> rest)
           _ -> go rest ((s, consumed) : acc)
 
 -- | Find a switch matching one of the keys.
@@ -136,8 +156,8 @@ findSwitch keys opts = go opts []
     go ((s, consumed) : rest) acc
       | consumed = go rest ((s, consumed) : acc)
       | s `elem` keys && not (isKeyValue s) =
-          Just $ reverse acc ++ [(s, True)] ++ rest
-      | otherwise = go rest ((s, consumed) : acc)
+          Just $ reverse acc <> [(s, True)] <> rest
+      | True = go rest ((s, consumed) : acc)
 
 -- | Try to consume a positional argument at a specific index.
 tryConsumeArgAt ::

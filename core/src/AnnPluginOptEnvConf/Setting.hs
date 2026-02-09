@@ -1,4 +1,5 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Trustworthy #-}
+{-# OPTIONS_GHC -fplugin-opt NoRecursion:ignore-methods:sconcat #-}
 
 -- | Extended settings with annotation support.
 --
@@ -14,16 +15,51 @@ module AnnPluginOptEnvConf.Setting
     fromBase,
     fromAnn,
 
-    -- * Re-exports for convenience
-    module OptEnvConf.Setting,
-    module AnnPluginOptEnvConf.Annotation,
+    -- * Re-exports from OptEnvConf.Setting
+    Builder (..),
+    Setting (..),
+    completeBuilder,
+
+    -- * Re-exports from AnnPluginOptEnvConf.Annotation
+    AnnBuilder (..),
+    AnnValSetting (..),
+    annSettingVals,
+    completeAnnBuilder,
   )
 where
 
-import Data.List.NonEmpty (NonEmpty)
-import qualified Data.List.NonEmpty as NE
-import OptEnvConf.Setting
-import AnnPluginOptEnvConf.Annotation
+import "base" Data.List.NonEmpty (NonEmpty)
+import "base" Data.Maybe (Maybe)
+import "base" Data.Monoid (Monoid, mconcat, mempty)
+import "base" Data.Semigroup (Semigroup, stimes, stimesMonoid, (<>))
+import "opt-env-conf" OptEnvConf.Setting
+  ( Builder (Builder),
+    Setting (Setting),
+    completeBuilder,
+    settingCompleter,
+    settingConfigVals,
+    settingDasheds,
+    settingDefaultValue,
+    settingEnvVars,
+    settingExamples,
+    settingHelp,
+    settingHidden,
+    settingMetavar,
+    settingReaders,
+    settingSwitchValue,
+    settingTryArgument,
+    settingTryOption,
+    unBuilder,
+  )
+import "this" AnnPluginOptEnvConf.Annotation
+  ( AnnBuilder (AnnBuilder),
+    AnnValSetting (AnnValSetting),
+    annSettingVals,
+    annValSettingCodec,
+    annValSettingKey,
+    completeAnnBuilder,
+    unAnnBuilder,
+  )
 
 -- | A setting extended with annotation support.
 --
@@ -53,10 +89,10 @@ instance Semigroup (AnnPluginBuilder a) where
       { apbBase = apbBase b1 <> apbBase b2,
         apbAnn = apbAnn b1 <> apbAnn b2
       }
+  stimes = stimesMonoid
 
 instance Monoid (AnnPluginBuilder a) where
   mempty = AnnPluginBuilder mempty mempty
-  mappend = (<>)
 
 -- | Lift a standard OptEnvConf builder to an 'AnnPluginBuilder'.
 fromBase :: Builder a -> AnnPluginBuilder a

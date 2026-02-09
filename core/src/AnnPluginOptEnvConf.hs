@@ -1,4 +1,5 @@
 {-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE Trustworthy #-}
 
 -- | OptEnvConf extended for GHC plugins with annotation support.
 --
@@ -78,13 +79,16 @@
 -- @
 module AnnPluginOptEnvConf
   ( -- * Running parsers
+
     -- ** Without annotations
     runPluginParser,
     runPluginParserOn,
+
     -- ** With annotations
     runAnnPluginParser,
     runAnnPluginParserOn,
     AnnPluginEnv (..),
+
     -- ** Errors
     PluginParseError (..),
 
@@ -94,13 +98,16 @@ module AnnPluginOptEnvConf
     PluginOptsState,
 
     -- * Annotation support
+
     -- ** Lookup types
     AnnLookup,
     AnnResult (..),
     annResultToMaybe,
+
     -- ** Setting types
     AnnSetting (..),
     AnnValSetting (..),
+
     -- ** Builders
     ann,
     annWith,
@@ -118,8 +125,203 @@ module AnnPluginOptEnvConf
   )
 where
 
-import OptEnvConf
-import AnnPluginOptEnvConf.Annotation
-import AnnPluginOptEnvConf.PluginOpts
-import AnnPluginOptEnvConf.Run
-import AnnPluginOptEnvConf.Setting
+-- Re-exported from OptEnvConf - this is a large list but necessary for explicit imports
+import "opt-env-conf" OptEnvConf
+  ( -- Types
+
+    -- Builders
+
+    -- Readers
+
+    -- Combinators
+
+    -- Config
+
+    -- Checks
+
+    -- Running
+
+    -- Path settings
+
+    -- String settings
+
+    -- Switch helpers
+
+    -- Casing
+
+    -- Completers
+
+    -- Docs
+
+    -- Re-exports from other modules
+
+    Alternative (empty, (<|>)),
+    Applicative (liftA2, pure, (*>), (<*), (<*>)),
+    Builder (Builder, unBuilder),
+    Functor (fmap, (<$)),
+    HasParser (settingsParser),
+    Help,
+    Metavar,
+    Parser,
+    Reader (Reader, unReader),
+    Selective (select),
+    Setting (Setting),
+    allOrNothing,
+    argument,
+    asum,
+    auto,
+    checkEither,
+    checkMapEither,
+    checkMapEitherForgivable,
+    checkMapIO,
+    checkMapIOForgivable,
+    checkMapMaybe,
+    checkMapMaybeForgivable,
+    checkMaybe,
+    choice,
+    combineConfigObjects,
+    commaSeparated,
+    commaSeparatedList,
+    commaSeparatedSet,
+    command,
+    commands,
+    completer,
+    conf,
+    confWith,
+    confWith',
+    configuredConfigFile,
+    defaultCommand,
+    directoryPath,
+    directoryPathSetting,
+    eitherReader,
+    enableDisableSwitch,
+    env,
+    example,
+    exists,
+    filePath,
+    filePathSetting,
+    help,
+    hidden,
+    liftA,
+    liftA3,
+    listCompleter,
+    listIOCompleter,
+    long,
+    makeDoubleSwitch,
+    many,
+    mapIO,
+    maybeReader,
+    metavar,
+    mkCompleter,
+    name,
+    option,
+    optional,
+    parserConfDocs,
+    parserDocs,
+    parserEnvDocs,
+    parserOptDocs,
+    readSecretTextFile,
+    reader,
+    runHelpParser,
+    runIO,
+    runParser,
+    runParserOn,
+    runSettingsParser,
+    secretTextFileOrBareSetting,
+    secretTextFileSetting,
+    setting,
+    settingCompleter,
+    settingConfigVals,
+    settingDasheds,
+    settingDefaultValue,
+    settingEnvVars,
+    settingExamples,
+    settingHelp,
+    settingHidden,
+    settingMetavar,
+    settingReaders,
+    settingSwitchValue,
+    settingTryArgument,
+    settingTryOption,
+    short,
+    shownExample,
+    some,
+    someNonEmpty,
+    str,
+    strArgument,
+    strOption,
+    subAll,
+    subArgs,
+    subArgs_,
+    subConfig,
+    subConfig_,
+    subEnv,
+    subEnv_,
+    subSettings,
+    switch,
+    toArgCase,
+    toConfigCase,
+    toEnvCase,
+    toShellFunctionCase,
+    value,
+    valueWithShown,
+    viaStringCodec,
+    withCombinedYamlConfigs,
+    withCombinedYamlConfigs',
+    withConfig,
+    withConfigurableYamlConfig,
+    withDefault,
+    withFirstYamlConfig,
+    withLocalYamlConfig,
+    withShownDefault,
+    withYamlConfig,
+    withoutConfig,
+    xdgYamlConfigFile,
+    yesNoSwitch,
+    (<$>),
+    (<**>),
+  )
+import "this" AnnPluginOptEnvConf.Annotation
+  ( AnnBuilder (AnnBuilder),
+    AnnLookup,
+    AnnResult (AnnError, AnnFound, AnnNotAttempted, AnnNotFound),
+    AnnSetting (AnnSetting),
+    AnnValSetting (AnnValSetting),
+    ann,
+    annResultToMaybe,
+    annSettingKeys,
+    annSettingReaders,
+    annSettingVals,
+    annValSettingCodec,
+    annValSettingKey,
+    annWith,
+    unAnnBuilder,
+  )
+import "this" AnnPluginOptEnvConf.PluginOpts
+  ( PluginOptsBackend (PluginOptsBackend),
+    PluginOptsState,
+    pluginOptsBackend,
+  )
+import "this" AnnPluginOptEnvConf.Run
+  ( AnnPluginEnv (AnnPluginEnv),
+    PluginParseError (PluginAnnotationError, PluginParseErrors),
+    apeCapabilities,
+    apeConfig,
+    apeEnvVars,
+    apePluginOpts,
+    runAnnPluginParser,
+    runAnnPluginParserOn,
+    runPluginParser,
+    runPluginParserOn,
+  )
+import "this" AnnPluginOptEnvConf.Setting
+  ( AnnPluginBuilder (AnnPluginBuilder),
+    AnnPluginSetting (AnnPluginSetting),
+    annPluginSetting,
+    annPluginSettingAnns,
+    annPluginSettingBase,
+    apbAnn,
+    apbBase,
+    fromAnn,
+    fromBase,
+  )

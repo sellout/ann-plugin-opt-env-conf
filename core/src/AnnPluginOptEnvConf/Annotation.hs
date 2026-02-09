@@ -1,5 +1,5 @@
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Trustworthy #-}
+{-# OPTIONS_GHC -fplugin-opt NoRecursion:ignore-methods:sconcat #-}
 
 -- | Annotation-based configuration for GHC plugins.
 --
@@ -30,10 +30,19 @@ module AnnPluginOptEnvConf.Annotation
   )
 where
 
-import Autodocodec (ValueCodec, HasCodec (..), maybeCodec)
-import Data.List.NonEmpty (NonEmpty (..), (<|))
-import qualified Data.List.NonEmpty as NE
-import OptEnvConf.Reader (Reader)
+import "autodocodec" Autodocodec (HasCodec, ValueCodec, codec, maybeCodec)
+import "base" Data.Eq (Eq)
+import "base" Data.Foldable (foldr)
+import "base" Data.Function (($))
+import "base" Data.Functor (Functor)
+import "base" Data.List.NonEmpty (NonEmpty ((:|)), (<|))
+import "base" Data.Maybe (Maybe (Just, Nothing), maybe)
+import "base" Data.Monoid (Monoid, mempty)
+import "base" Data.Semigroup (Semigroup, stimes, stimesMonoid, (<>))
+import "base" Data.String (String)
+import "base" System.IO (IO)
+import "base" Text.Show (Show)
+import "opt-env-conf" OptEnvConf.Reader (Reader)
 
 -- | Configuration for looking up annotation values.
 --
@@ -51,7 +60,8 @@ data AnnSetting a = AnnSetting
 -- | A single annotation value configuration with its codec.
 --
 -- This is analogous to 'OptEnvConf.Setting.ConfigValSetting'.
-data AnnValSetting a = forall void.
+data AnnValSetting a
+  = forall void.
   AnnValSetting
   { annValSettingKey :: !String,
     annValSettingCodec :: !(ValueCodec void (Maybe a))
@@ -112,10 +122,10 @@ newtype AnnBuilder a = AnnBuilder {unAnnBuilder :: [AnnBuildInstruction a]}
 
 instance Semigroup (AnnBuilder a) where
   (<>) (AnnBuilder b1) (AnnBuilder b2) = AnnBuilder (b1 <> b2)
+  stimes = stimesMonoid
 
 instance Monoid (AnnBuilder a) where
   mempty = AnnBuilder []
-  mappend = (<>)
 
 -- | Instructions for building annotation settings.
 data AnnBuildInstruction a

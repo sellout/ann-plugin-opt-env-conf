@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Trustworthy #-}
 
 -- | Entry points for running parsers in a GHC plugin context.
 --
@@ -20,18 +20,26 @@ module AnnPluginOptEnvConf.Run
   )
 where
 
-import Data.List.NonEmpty (NonEmpty)
-import qualified Data.Aeson as JSON
-import OptEnvConf (Parser)
-import OptEnvConf.ArgsBackend (initArgsState)
-import OptEnvConf.Capability (Capabilities, allCapabilities)
-import OptEnvConf.EnvMap (EnvMap)
-import qualified OptEnvConf.EnvMap as EnvMap
-import OptEnvConf.Error (ParseError)
-import OptEnvConf.Run (runParserOnWith)
-import AnnPluginOptEnvConf.Annotation
-import AnnPluginOptEnvConf.PluginOpts
-import System.Environment (getEnvironment)
+import qualified "aeson" Data.Aeson as JSON
+import "base" Control.Applicative (pure)
+import "base" Data.Either (Either (Left, Right))
+import "base" Data.Function (($))
+import "base" Data.Functor ((<$>))
+import "base" Data.List.NonEmpty (NonEmpty)
+import "base" Data.Maybe (Maybe (Nothing))
+import "base" Data.String (String)
+import "base" System.Environment (getEnvironment)
+import "base" System.IO (IO)
+import "base" Text.Show (Show)
+import "opt-env-conf" OptEnvConf (Parser)
+import "opt-env-conf" OptEnvConf.ArgsBackend (initArgsState)
+import "opt-env-conf" OptEnvConf.Capability (Capabilities, allCapabilities)
+import "opt-env-conf" OptEnvConf.EnvMap (EnvMap)
+import qualified "opt-env-conf" OptEnvConf.EnvMap as EnvMap
+import "opt-env-conf" OptEnvConf.Error (ParseError)
+import "opt-env-conf" OptEnvConf.Run (runParserOnWith)
+import "this" AnnPluginOptEnvConf.Annotation (AnnLookup)
+import "this" AnnPluginOptEnvConf.PluginOpts (pluginOptsBackend)
 
 -- | Errors that can occur during plugin option parsing.
 data PluginParseError
