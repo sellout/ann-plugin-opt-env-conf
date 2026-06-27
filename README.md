@@ -2,10 +2,7 @@
 
 `{-# ANN #-}` / `-fplugin-opt` / `$ENV` / `*.conf`
 
--[![built with garnix](https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fsellout%2Fann-plugin-opt-env-conf)](https://garnix.io/repo/sellout/ann-plugin-opt-env-conf)
--[![GitHub CI](https://github.com/sellout/ann-plugin-opt-env-conf/actions/workflows/build.yml/badge.svg)](https://github.com/sellout/ann-plugin-opt-env-conf/actions/workflows/build.yml)
--[![Nix CI](https://nix-ci.com/badge/gh:sellout:ann-plugin-opt-env-conf)](https://nix-ci.com/gh:sellout:ann-plugin-opt-env-conf)
--[![Project Manager](https://img.shields.io/badge/%20-Project%20Manager-%235277C3?logo=nixos&labelColor=%23cccccc)](https://sellout.github.io/project-manager/)
+-[![built with garnix](https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fsellout%2Fann-plugin-opt-env-conf)](https://garnix.io/repo/sellout/ann-plugin-opt-env-conf) -[![GitHub CI](https://github.com/sellout/ann-plugin-opt-env-conf/actions/workflows/build.yml/badge.svg)](https://github.com/sellout/ann-plugin-opt-env-conf/actions/workflows/build.yml) -[![Nix CI](https://nix-ci.com/badge/gh:sellout:ann-plugin-opt-env-conf)](https://nix-ci.com/gh:sellout:ann-plugin-opt-env-conf) -[![Project Manager](https://img.shields.io/badge/%20-Project%20Manager-%235277C3?logo=nixos&labelColor=%23cccccc)](https://sellout.github.io/project-manager/)
 
 Unified handling of command-line options, environment variables, config files, and source annotations for GHC plugins.
 
